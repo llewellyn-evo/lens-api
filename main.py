@@ -46,7 +46,7 @@ def main():
 	liquidLensThread = threading.Thread(target = liquidLensProcess , args = ( module , exitEvent))
 	liquidLensThread.start()
 
-	app.run()
+	app.run(host='0.0.0.0')
 	exitEvent.set()
 	if liquidLensThread.is_alive():
 		liquidLensThread.join()
