@@ -11,28 +11,26 @@ from liquidlenshandler import liquidLensProcess
 
 
 def read_config():
-	config = default
+    config = default
 
-	try:
-		#Get absolute path of this file 
-		dirname = os.getcwd()
-		#append path to file config file
-		filename = os.path.join(dirname, 'config/config.json')
-		#Now we have the absolute path of the config file
-		#Check if the file exists
-		if os.path.isfile(filename):
-			#If file found Load configs is module variable
-			print("Config file exits .. Loading now !")
-			with open(filename) as config_file:
-				config = json.load(config_file)
+    try:
+        filename = os.path.join(os.path.dirname(__file__), 'config/config.json')
+        #Now we have the absolute path of the config file
+        #Check if the file exists
+        print(filename)
+        if os.path.isfile(filename):
+            #If file found Load configs is module variable
+            print("Config file exits .. Loading now !")
+            with open(filename) as config_file:
+                config = json.load(config_file)
 
-	except Exception as e:
-		print ("Exception Encountered " + str(e))
+    except Exception as e:
+        print ("Exception Encountered " + str(e))
 
-	#pretty print the loaded json config
-	print (json.dumps(config, indent=4, sort_keys=True))
+    #pretty print the loaded json config
+    print (json.dumps(config, indent=4, sort_keys=True))
 
-	return config
+    return config
 
 
 
@@ -46,7 +44,7 @@ def main():
 	liquidLensThread = threading.Thread(target = liquidLensProcess , args = ( module , exitEvent))
 	liquidLensThread.start()
 
-	app.run(host='0.0.0.0')
+	app.run(host="0.0.0.0", port=8001)
 	exitEvent.set()
 	if liquidLensThread.is_alive():
 		liquidLensThread.join()
