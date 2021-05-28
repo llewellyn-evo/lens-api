@@ -9,10 +9,13 @@ from variables import app
 import json
 from smbus import SMBus
 import os
-
+import bme280
 
 liquidLens = {}
 data = None
+
+bme_address = 0x76
+bme280_calib = None
 
 i2cbus = SMBus(1)  # Create a new I2C bus
 i2cAddress = [0x23 , 0x77]
@@ -60,6 +63,14 @@ def setValues(val):
     except Exception as e:
         print("Write to i2c Failes " + str(e))
 
+def setup_bme280():
+    global bme280_calib
+    try:
+        bme280_calib = bme280.load_calibration_params(i2cbus, bme_address)
+    except Exception as e:
+        print("Error in getting bme280 calibration " + str(e))
+
+
 
 def liquidLensProcess(module , exitEvent ):
     global liquidLens
@@ -75,6 +86,18 @@ def liquidLensProcess(module , exitEvent ):
             time.sleep(0.5)
     except Exception as e:
         print("i2C setup Failed" + str(e))
+
+@app.route('/bme280' , methods = ["GET"])
+def bme280data():
+    global bme280_calib
+    try:
+        # compensated_reading object
+        data = bme280.sample(i2cbus, bme_address, bme280_calib)
+    
+        return json.dumps({"temp": "{:.2f}".format(data.temperature), "hum": "{:.2f}".format(data.humidity), "pres" : "{:.2f}".format(data.pressure)}), status.HTTP_200_OK
+    except Exception as e:
+        print("Error in reading bme280 ", str(e))
+        return "Error in reading bme280 device" ,status.HTTP_503_SERVICE_UNAVAILABLE
 
 
 @app.route('/liquidLens' , methods = ["GET" , "POST"])

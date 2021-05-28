@@ -1,0 +1,13 @@
+[Unit]
+Description=start api for liquid lens
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=jetson-nano
+ExecStart=/usr/bin/python3 /home/jetson-nano/lens-api/main.py
+
+[Install]
+WantedBy=multi-user.target
